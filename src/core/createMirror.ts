@@ -20,7 +20,6 @@ export const createMirror = async (
     const dir = dirname(to)
     if (!(await FS.exists(dir))) await FS.mkPath(dir)
     if (!(await FS.exists(to))) {
-      await FS.copy(from, to)
       const text = await FS.readFile(from).then(b => b.toString())
       return result.concat({
         type: "create",

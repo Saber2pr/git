@@ -21,16 +21,19 @@ export const diff = async (
   const diffResult = await paths.reduce<Promise<Commit[]>>(
     async (acc, [origin, mirror]) => {
       const result = await acc
-      const old = await FS.readFile(mirror).then(b => b.toString())
-      const now = await FS.readFile(origin).then(b => b.toString())
-      if (old === now) return result
-      return result.concat([
-        {
-          type: "update",
-          master: { path: origin, text: now },
-          origin: { path: mirror, text: old }
-        }
-      ])
+      if (await FS.exists(mirror)) {
+        const old = await FS.readFile(mirror).then(b => b.toString())
+        const now = await FS.readFile(origin).then(b => b.toString())
+        if (old === now) return result
+        return result.concat([
+          {
+            type: "update",
+            master: { path: origin, text: now },
+            origin: { path: mirror, text: old }
+          }
+        ])
+      }
+      return result
     },
     Promise.resolve([])
   )
